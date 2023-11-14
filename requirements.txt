@@ -1,0 +1,7 @@
+dash
+dash_daq
+geopandas
+numpy
+pandas
+plotly
+Shapely
