@@ -5,3 +5,7 @@ numpy
 pandas
 plotly
 Shapely
+ipython
+mobfot
+ipykernel
+icecream
