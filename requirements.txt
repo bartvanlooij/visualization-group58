@@ -9,3 +9,4 @@ ipython
 mobfot
 ipykernel
 icecream
+tqdm
