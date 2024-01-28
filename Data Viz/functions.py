@@ -153,13 +153,32 @@ def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, pla
 
     elif button_id == 'playoff-bracket-button':
         fig = create_playoff_bracket()
-        return html.Div(children=[daq.BooleanSwitch(id='spoiler-switch', on=False, label='Spoilers'),dcc.Graph(id='bracket', figure=fig, 
-                     style={'width': playoff_right, 'height': playoff_top})])
+        return html.Div(children=[
+                                    html.A(html.Button('Home', id='home-button-playoff-bracket', 
+                                                style={
+                                                        'display': 'inline-block', 
+                                                        'float': 'right', 'border': 
+                                                        '1px solid black', 'color': 'black', 
+                                                        'backgroundColor': '#f9f9f9', 
+                                                        'margin-top': '10px', 
+                                                        'margin-bottom': '10px'
+                                                        }),href='/'),
+                                    daq.BooleanSwitch(id='spoiler-switch', on=False, label='Spoilers'),
+                                    dcc.Graph(
+                                                id='bracket', 
+                                                figure=fig, 
+                                                style={
+                                                        'width': playoff_right, 
+                                                        'height': playoff_top
+                                                        }
+                                                )
+                                ]
+                        )
 
     elif 'team-button' in button_id:
         clicked_team = extract_team_name(ctx.triggered[0]['prop_id'])
         return create_team_dashboard(clicked_team)
-
+    
     return initial_app_content
 
 

@@ -9,7 +9,6 @@ from initial_content import app
 import pandas as pd
 from variables import data_folder, playoff_right, playoff_top
 
-
 def get_score_stings(df, team_names, teams):
     score = df[(df['home_team'] == team_names[teams[0]]) & (df['away_team'] == team_names[teams[1]])]['score'].values[0]
     if len(score) == 3:
@@ -67,9 +66,9 @@ def create_playoff_bracket(spoilers=False):
     line_width = 1
     center_x = (right-left)/2
     center_y = (top-bottom)/2
-    text_spacing = 20
+    text_spacing = 50
     font_size = 15
-    start_y_text = 20
+    start_y_text = -30
     text_left_spacing = 10
     text_right_spacing = 20
     font_color = 'RoyalBlue'
