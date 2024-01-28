@@ -1,6 +1,7 @@
 import dash
 from dash import html, dcc, Input, Output, State, dash_table, ALL
 from dash.exceptions import PreventUpdate
+import dash_daq as daq
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -9,6 +10,7 @@ from jbi100_app.views.menu import make_menu_layout
 from initial_content import *
 from variables import data_folder
 from playoff import *
+from variables import playoff_right, playoff_top
 # File paths for the CSV files in same foldefr/
 
 team_data_csv = f'{data_folder}/team_data.csv'
@@ -150,8 +152,9 @@ def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, pla
         return create_player_comparison_dashboard(player_options)
 
     elif button_id == 'playoff-bracket-button':
-        playoff_bracket = create_playoff_bracket()
-        return playoff_bracket
+        fig = create_playoff_bracket()
+        return html.Div(children=[daq.BooleanSwitch(id='spoiler-switch', on=False, label='Spoilers'),dcc.Graph(id='bracket', figure=fig, 
+                     style={'width': playoff_right, 'height': playoff_top})])
 
     elif 'team-button' in button_id:
         clicked_team = extract_team_name(ctx.triggered[0]['prop_id'])
