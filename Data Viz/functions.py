@@ -8,12 +8,12 @@ from jbi100_app.modified_data import *
 from jbi100_app.views.menu import make_menu_layout
 from initial_content import *
 from variables import data_folder
+from playoff import *
 # File paths for the CSV files in same foldefr/
 
 team_data_csv = f'{data_folder}/team_data.csv'
 player_data_csv = f'{data_folder}/Player_stats.csv'
 match_data_csv = f'{data_folder}/match_data.csv'
-app = dash.Dash(__name__)
 # Read merge n fix player data
 def load_and_merge_player_data():
     df_defense = pd.read_csv(f'{data_folder}/player_defense.csv')
@@ -133,10 +133,11 @@ group_accordions = create_accordion(df_teams)
 @app.callback(
     Output('app-container', 'children'),
     [Input({'type': 'team-button', 'index': ALL}, 'n_clicks'),
-     Input('player-comparison-dashboard-button', 'n_clicks')],
+     Input('player-comparison-dashboard-button', 'n_clicks'),
+     Input('playoff-bracket-button', 'n_clicks')],
     prevent_initial_call=True)
 
-def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks):
+def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, playoff_bracket_clicks):
     ctx = dash.callback_context
 
     if not ctx.triggered:
@@ -148,6 +149,9 @@ def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks):
         player_options = get_player_names()
         return create_player_comparison_dashboard(player_options)
 
+    elif button_id == 'playoff-bracket-button':
+        playoff_bracket = create_playoff_bracket()
+        return playoff_bracket
 
     elif 'team-button' in button_id:
         clicked_team = extract_team_name(ctx.triggered[0]['prop_id'])

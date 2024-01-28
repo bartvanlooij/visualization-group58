@@ -3,8 +3,11 @@ import pandas as pd
 from jbi100_app.modified_data import *
 from variables import data_folder
 from create_player_data import *
+from dash import Dash
 df_teams = pd.read_csv(f'{data_folder}/group_stats.csv')
 team_data_csv = f'{data_folder}/team_data.csv'
+
+app = Dash('FIFA World Cup 2022')
 
 
 def create_accordion(df_teams):
@@ -78,6 +81,15 @@ initial_app_content = html.Div([
     
     html.Div([
         html.Button('Player Comparison Dashboard', id='player-comparison-dashboard-button', style={
+            'border': '1px solid blue',
+            'fontSize': '20px',
+            'color': 'blue',
+            'width': '48%',  # Set width to 50%
+            'margin': '10px auto',  # Auto margins horizontally to center the button
+            'cursor': 'pointer',
+    })], style={'width': '96%','text-align': 'center', 'display': 'inline-block', }),
+    html.Div([
+        html.Button('Playoff Bracket', id='playoff-bracket-button', style={
             'border': '1px solid blue',
             'fontSize': '20px',
             'color': 'blue',
