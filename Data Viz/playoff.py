@@ -1,6 +1,6 @@
-
-
+from os import sep
 from dash import html, dcc, Input, Output, State
+from matplotlib.pyplot import box
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -8,7 +8,7 @@ import dash_daq as daq
 from initial_content import app
 import pandas as pd
 from variables import data_folder, playoff_right, playoff_top
-
+import time
 def get_score_stings(df, team_names, teams):
     score = df[(df['home_team'] == team_names[teams[0]]) & (df['away_team'] == team_names[teams[1]])]['score'].values[0]
     if len(score) == 3:
@@ -30,7 +30,7 @@ def compute_winner(scores):
             return [False,True]
 
 
-def create_playoff_bracket(spoilers=False):
+def create_playoff_bracket(spoilers=False, initialize=False):
     df = pd.read_csv(f'{data_folder}/match_data.csv')
     df = df[['home_team', 'away_team', 'score']]
     
@@ -51,7 +51,7 @@ def create_playoff_bracket(spoilers=False):
                   'Japan': 'Japan',
                   'Croatia': 'Croatia'
                   }
-    
+    heatmap_scale = 0.4
     font = "Courier New, monospace"
     left = 0
     right = playoff_right
@@ -93,7 +93,6 @@ def create_playoff_bracket(spoilers=False):
     fig.update_yaxes(range=[bottom, top])
     
     start_y = center_y - 2*(box_height + space_between_boxes) + space_between_boxes/2 
-    
     #Create header bar
     fig.add_shape(type="rect",
                     x0=left,
@@ -179,18 +178,28 @@ def create_playoff_bracket(spoilers=False):
                         align='center'
                         )
     
+    boxes_x = []
+    boxes_y = []
+    boxes_text = []
     #The 1/8 finals
     for i in range(4):
         #Create 4 boxes on the left side of the 
         #bracket making the allgined in the middle of the y
+        x0 = left+ vertical_border_spacing
+        y0 = start_y + i*(box_height + space_between_boxes)
+        x1 = left+box_width+ vertical_border_spacing
+        y1 = start_y+box_height + i*(box_height + space_between_boxes)
+        boxes_x.append([x0,x1])
+        boxes_y.append([y0,y1])
         fig.add_shape(type="rect",
-                      x0=left+ vertical_border_spacing,
-                      y0=start_y + i*(box_height + space_between_boxes),
-                      x1=left+box_width+ vertical_border_spacing,
-                      y1=start_y+box_height + i*(box_height + space_between_boxes),
+                      x0=x0,
+                      y0=y0,
+                      x1=x1,
+                      y1=y1,
                       line=dict(color=line_color,width=line_width),
                       fillcolor="LightSkyBlue")
         teams = eigth_finals[i].split(' - ')
+        boxes_text.append([team_names[teams[0]], team_names[teams[1]]])
         scores = get_score_stings(df, team_names, teams)
         winner = compute_winner(scores)
         for j, team in enumerate(teams):
@@ -213,6 +222,7 @@ def create_playoff_bracket(spoilers=False):
                 
                 scores = get_score_stings(df, team_names, teams)
                 winner = compute_winner(scores)
+
                 
                 fig.add_annotation(x=left + box_width + vertical_border_spacing - 2*text_right_spacing,
                                 y=start_y+box_height/2 + i*(box_height + space_between_boxes)- j*text_spacing - start_y_text,
@@ -228,16 +238,23 @@ def create_playoff_bracket(spoilers=False):
                                 )
         #Create 4 boxes on the right side of the
         #bracket making the allgined in the middle of the y
+        x0 = right-box_width - vertical_border_spacing
+        y0 = start_y + i*(box_height + space_between_boxes)
+        x1 = right - vertical_border_spacing
+        y1 = start_y+box_height + i*(box_height + space_between_boxes)
+        boxes_x.append([x0,x1])
+        boxes_y.append([y0,y1])
         fig.add_shape(type="rect",
-                      x0=right-box_width - vertical_border_spacing,
-                      y0=start_y + i*(box_height + space_between_boxes),
-                      x1=right - vertical_border_spacing,
-                      y1=start_y+box_height + i*(box_height + space_between_boxes),
+                      x0=x0,
+                      y0=y0,
+                      x1=x1,
+                      y1=y1,
                       line=dict(color=line_color,width=line_width),
                       fillcolor="LightSkyBlue")
         teams = eigth_finals[i+4].split(' - ')
         scores = get_score_stings(df, team_names, teams)
         winner = compute_winner(scores)
+        boxes_text.append([team_names[teams[0]], team_names[teams[1]]])
         for j, team in enumerate(teams):
             if spoilers:
                 team_string = f'<b>{team}' if winner[j] else team
@@ -275,24 +292,37 @@ def create_playoff_bracket(spoilers=False):
     for i in range(2):
         #Create 2 boxes on vertical_distance pixels to the right of the left side of the bracket
         #
+        x0 = left+box_width+vertical_distance+ vertical_border_spacing
+        x1 = left+box_width+vertical_distance+box_width + vertical_border_spacing
+        y0 = start_y + 2*i*(box_height + space_between_boxes) + (box_height + space_between_boxes)/2
+        y1 = start_y+box_height + 2*i*(box_height + space_between_boxes) + (box_height + space_between_boxes)/2
         fig.add_shape(type="rect",
-                      x0=left+box_width+vertical_distance+ vertical_border_spacing,
-                      y0=start_y + 2*i*(box_height + space_between_boxes) + (box_height + space_between_boxes)/2,
-                      x1=left+box_width+vertical_distance+box_width + vertical_border_spacing,
-                      y1=start_y+box_height + 2*i*(box_height + space_between_boxes) + (box_height + space_between_boxes)/2,
+                      x0=x0,
+                      y0=y0,
+                      x1=x1,
+                      y1=y1,
                       line=dict(color=line_color,width=line_width),
                       fillcolor="LightSkyBlue")
         # Create 2 boxes on vertical_distance pixels to the left of the right side of the bracket
         #
+        boxes_x.append([x0,x1])
+        boxes_y.append([y0,y1])
+        x0 = right-box_width-vertical_distance-box_width - vertical_border_spacing
+        x1 = right-box_width-vertical_distance- vertical_border_spacing
+        y0 = start_y + 2*i*(box_height + space_between_boxes) + (box_height + space_between_boxes)/2
+        y1 = start_y+box_height + 2*i*(box_height + space_between_boxes) + (box_height + space_between_boxes)/2
+        boxes_x.append([x0,x1])
+        boxes_y.append([y0,y1])
         fig.add_shape(type="rect",
-                      x0=right-box_width-vertical_distance-box_width - vertical_border_spacing,
-                      y0=start_y + 2*i*(box_height + space_between_boxes) + (box_height + space_between_boxes)/2,
-                      x1=right-box_width-vertical_distance- vertical_border_spacing,
-                      y1=start_y+box_height + 2*i*(box_height + space_between_boxes) + (box_height + space_between_boxes)/2,
+                      x0=x0,
+                      y0=y0,
+                      x1=x1,
+                      y1=y1,
                       line=dict(color=line_color,width=line_width),
                       fillcolor="LightSkyBlue")
         teams = quart_finals[i].split(' - ')
         scores = get_score_stings(df, team_names, teams)
+        boxes_text.append([team_names[teams[0]], team_names[teams[1]]])
         winner = compute_winner(scores)
         if spoilers:
             for j, team in enumerate(teams):
@@ -325,6 +355,7 @@ def create_playoff_bracket(spoilers=False):
                                 )
                 
             teams = quart_finals[i+2].split(' - ')
+            boxes_text.append([team_names[teams[0]], team_names[teams[1]]])
             for j, team in enumerate(teams):
                 team_string = f'<b>{team}' if winner[j] else team
                 fig.add_annotation(x=right-box_width-vertical_distance-box_width - vertical_border_spacing + text_left_spacing,
@@ -395,23 +426,36 @@ def create_playoff_bracket(spoilers=False):
                             line=dict(color=line_color,width=line_width))
         
     # Semi finals
+    x0 = left+box_width+2*vertical_distance+box_width + vertical_border_spacing
+    x1 = left+box_width+2*vertical_distance+2*box_width + vertical_border_spacing
+    y0 = center_y + (box_height)/2
+    y1 = center_y - (box_height)/2
+    boxes_x.append([x0,x1])
+    boxes_y.append([y0,y1])
     fig.add_shape(type="rect",
-                    x0=left+box_width+2*vertical_distance+box_width + vertical_border_spacing,
-                    y0=center_y + (box_height)/2,
-                    x1=left+box_width+2*vertical_distance+2*box_width + vertical_border_spacing,
-                    y1=center_y - (box_height)/2,
+                    x0=x0,
+                    y0=y0,
+                    x1=x1,
+                    y1=y1,
                     line=dict(color=line_color,width=line_width),
                     fillcolor="LightSkyBlue")
+    x0 = right-box_width-2*vertical_distance-2*box_width - vertical_border_spacing
+    x1 = right-box_width-2*vertical_distance-box_width - vertical_border_spacing
+    y0 = y0=center_y + (box_height)/2
+    y1 = center_y - (box_height)/2
+    boxes_x.append([x0,x1])
+    boxes_y.append([y0,y1])
     fig.add_shape(type="rect",
-                    x0=right-box_width-2*vertical_distance-2*box_width - vertical_border_spacing,
-                    y0=center_y + (box_height)/2,
-                    x1=right-box_width-2*vertical_distance-box_width - vertical_border_spacing,
-                    y1=center_y - (box_height)/2,
+                    x0=x0,
+                    y0=y0,
+                    x1=x1,
+                    y1=y1,
                     line=dict(color=line_color,width=line_width),
                     fillcolor="LightSkyBlue")
     teams = semi_finals[0].split(' - ')
     scores = get_score_stings(df, team_names, teams)
     winners = compute_winner(scores)
+    boxes_text.append([team_names[teams[0]], team_names[teams[1]]])
     if spoilers:
         for j, team in enumerate(teams):
             team_string = f'<b>{team}' if winners[j] else team
@@ -442,6 +486,7 @@ def create_playoff_bracket(spoilers=False):
         teams = semi_finals[1].split(' - ')
         scores = get_score_stings(df, team_names, teams)
         winners = compute_winner(scores)
+        boxes_text.append([team_names[teams[0]], team_names[teams[1]]])
         for j, team in enumerate(teams):
             team_string = f'<b>{team}' if winners[j] else team
             fig.add_annotation(x=right-box_width-2*vertical_distance-2*box_width - vertical_border_spacing + text_left_spacing,
@@ -505,11 +550,17 @@ def create_playoff_bracket(spoilers=False):
                             y1=center_y,
                             line=dict(color=line_color,width=line_width))
     # Third place
+    x0 = center_x - box_width/2
+    x1 = center_x + box_width/2
+    y0 = center_y - 3*box_height
+    y1 = center_y - 2*box_height
+    boxes_x.append([x0,x1])
+    boxes_y.append([y0,y1])
     fig.add_shape(type="rect",
-                    x0=center_x - box_width/2,
-                    y0=center_y - 3*box_height,
-                    x1=center_x + box_width/2,
-                    y1=center_y - 2*box_height,
+                    x0=x0,
+                    y0=y0,
+                    x1=x1,
+                    y1=y1,
                     line=dict(color=line_color,width=line_width),
                     fillcolor="LightSkyBlue")            
     fig.add_annotation(x=center_x,
@@ -528,6 +579,7 @@ def create_playoff_bracket(spoilers=False):
         teams = third_place[0].split(' - ')
         scores = get_score_stings(df, team_names, teams)
         winners = compute_winner(scores)
+        boxes_text.append([team_names[teams[0]], team_names[teams[1]]])
         for j, team in enumerate(teams):
             team_string = f'<b>{team}' if winners[j] else team
             fig.add_annotation(x=center_x - box_width/2 + text_left_spacing,
@@ -555,11 +607,17 @@ def create_playoff_bracket(spoilers=False):
                             align='right'
                             )
     # Final
+    x0 = center_x - box_width/2
+    x1 = center_x + box_width/2
+    y0 = center_y + (box_height)/2
+    y1 = center_y - (box_height)/2
+    boxes_x.append([x0,x1])
+    boxes_y.append([y0,y1])
     fig.add_shape(type="rect",
-                    x0=center_x - box_width/2,
-                    y0=center_y + (box_height)/2,
-                    x1=center_x + box_width/2,
-                    y1=center_y - (box_height)/2,
+                    x0=x0,
+                    y0=y0,
+                    x1=x1,
+                    y1=y1,
                     line=dict(color=line_color,width=line_width),
                     fillcolor="LightSkyBlue")
     fig.add_annotation(x=center_x,
@@ -579,6 +637,7 @@ def create_playoff_bracket(spoilers=False):
         teams = final[0].split(' - ')
         scores = get_score_stings(df, team_names, teams)
         winners = compute_winner(scores)
+        boxes_text.append([team_names[teams[0]], team_names[teams[1]]])
         for j, team in enumerate(teams):
             team_string = f'<b>{team}' if winners[j] else team
             fig.add_annotation(x=center_x - box_width/2 + text_left_spacing,
@@ -617,7 +676,32 @@ def create_playoff_bracket(spoilers=False):
                     x1=center_x + box_width/2,
                     y1=center_y,
                     line=dict(color=line_color,width=line_width))
-    return fig
+    fig.update_layout(clickmode='event+select')
+    
+    
+    fig.add_trace(go.Heatmap(
+        z=[[1 for _ in range(int(right*heatmap_scale))] for _ in range(int(top*heatmap_scale))],
+        hoverinfo='none',
+        showscale=False,
+        x=[x/heatmap_scale for x in range(int(right*heatmap_scale))],
+        y=[y/heatmap_scale for y in range(int(top*heatmap_scale))],
+        hoverongaps=True,
+        name='Heatmap',
+        text=[x for x in range(int(right*heatmap_scale*top*heatmap_scale))],
+    ))
+    for index, box in enumerate(boxes_x):
+        box.sort()
+        boxes_x[index] = box
+        
+    for index, box in enumerate(boxes_y):
+        box.sort()
+        boxes_y[index] = box
+        
+    boxes_data = {'x': boxes_x, 'y': boxes_y, 'text': boxes_text}
+    if initialize:
+        return fig, boxes_data
+    else:
+        return fig
     
 @app.callback(
     Output('bracket', 'figure'),
@@ -626,3 +710,47 @@ def create_playoff_bracket(spoilers=False):
 def show_match_results(spoilers):
     return create_playoff_bracket(spoilers)
     
+    
+    
+@app.callback(
+    Output('debug', 'children'),
+    Input('bracket', 'clickData'),
+    State('boxes-store', 'data'),
+)
+def bracket_click(clickData, storedata):
+    x = clickData['points'][0]['x']
+    y = clickData['points'][0]['y']
+    boxes_x = storedata['x']
+    boxes_x = [tuple(x) for x in boxes_x]
+    boxes_y = storedata['y']
+    boxes_y = [tuple(y) for y in boxes_y]
+    boxes_text = [['Brazil', 'Korea Republic'],
+                  ['Portugal', 'Switzerland'],
+                  ['Japan', 'Croatia'],
+                  ['Morocco', 'Spain'],
+                  ['Argentina', 'Australia'],
+                  ['France', 'Poland'],
+                  ['Netherlands', 'USA'],
+                  ['England', 'Senegal'],
+                  ['Croatia', 'Brazil'],
+                  ['Morocco', 'Portugal'],
+                  ['Netherlands', 'Argentina'],
+                  ['England', 'France'],
+                  ['Argentina', 'Croatia'],
+                  ['France', 'Morocco'],
+                  ['Croatia', 'Morocco'],
+                  ['Argentina', 'France']]
+    x_range_true = []
+    y_range_true = []
+    for index_y, (start_x, end_x) in enumerate(boxes_x):
+        if start_x <= x <= end_x:
+            x_range_true.append(index_y)
+    for index_y, (start_y, end_y) in enumerate(boxes_y):
+        if start_y <= y <= end_y:
+            y_range_true.append(index_y)
+    
+    both_true = list(set(x_range_true).intersection(y_range_true))
+    if both_true:
+        return str(boxes_text[both_true[0]])
+        
+    return 'No box selected'

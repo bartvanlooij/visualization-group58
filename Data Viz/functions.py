@@ -152,7 +152,7 @@ def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, pla
         return create_player_comparison_dashboard(player_options)
 
     elif button_id == 'playoff-bracket-button':
-        fig = create_playoff_bracket()
+        fig, boxes_data = create_playoff_bracket(initialize=True)
         return html.Div(children=[
                                     html.A(html.Button('Home', id='home-button-playoff-bracket', 
                                                 style={
@@ -164,6 +164,7 @@ def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, pla
                                                         'margin-bottom': '10px'
                                                         }),href='/'),
                                     daq.BooleanSwitch(id='spoiler-switch', on=False, label='Spoilers'),
+                                    dcc.Store(id='boxes-store', data=boxes_data),
                                     dcc.Graph(
                                                 id='bracket', 
                                                 figure=fig, 
@@ -171,7 +172,8 @@ def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, pla
                                                         'width': playoff_right, 
                                                         'height': playoff_top
                                                         }
-                                                )
+                                                ),
+                                    html.H2(id='debug')
                                 ]
                         )
 
