@@ -3,6 +3,7 @@ from dash import html, dcc
 from dash.dependencies import Input, Output, MATCH, State, ALL
 from dash.exceptions import PreventUpdate
 from dash import html, dcc, callback_context
+from match_dashboard import *
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -46,7 +47,15 @@ initial_app_content = html.Div([
             'width': '48%',  # Set width to 50%
             'margin': '10px auto',  # Auto margins horizontally to center the button
             'cursor': 'pointer',
-    })], style={'width': '96%','text-align': 'center', 'display': 'inline-block', }),
+    }),
+    html.Button('button for sophie', id='match_dashboard_button', style={
+            'border': '1px solid blue',
+            'fontSize': '20px',
+            'color': 'blue',
+            'width': '48%',  # Set width to 50%
+            'margin': '10px auto',  # Auto margins horizontally to center the button
+            'cursor': 'pointer',
+    })], style={'width': '100%','text-align': 'center', 'display': 'flex', 'justify-content': 'space-between' }),
     # New row for the three graphs
     html.Div([
         html.Div([
@@ -79,10 +88,11 @@ app.layout = html.Div(
 @app.callback(
     Output('app-container', 'children'),
     [Input({'type': 'team-button', 'index': ALL}, 'n_clicks'),
-     Input('player-comparison-dashboard-button', 'n_clicks')],
+     Input('player-comparison-dashboard-button', 'n_clicks'),
+     Input('match_dashboard_button', 'n_clicks')],
     prevent_initial_call=True)
 
-def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks):
+def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, match_dashboard_clicks):
     ctx = dash.callback_context
 
     if not ctx.triggered:
@@ -93,6 +103,10 @@ def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks):
     if button_id == 'player-comparison-dashboard-button':
         player_options = get_player_names()
         return create_player_comparison_dashboard(player_options)
+    
+    if button_id == 'match_dashboard_button':
+        return create_match_dashboard("Senegal", "Netherlands")
+
 
 
     elif 'team-button' in button_id:
