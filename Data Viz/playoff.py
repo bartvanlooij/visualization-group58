@@ -1,10 +1,7 @@
-from os import sep
+
 from dash import html, dcc, Input, Output, State
-from matplotlib.pyplot import box
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
-import dash_daq as daq
 from initial_content import app
 import pandas as pd
 from variables import data_folder, playoff_right, playoff_top
@@ -709,9 +706,7 @@ def create_playoff_bracket(spoilers=False, initialize=False):
     prevent_initial_call=True)
 def show_match_results(spoilers):
     return create_playoff_bracket(spoilers)
-    
-    
-    
+        
 @app.callback(
     Output('debug', 'children'),
     Input('bracket', 'clickData'),

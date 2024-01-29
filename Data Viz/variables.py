@@ -7,3 +7,5 @@ header_style = {"textAlign": "center", "color": text_color}
 subheader_style = {"textAlign": "left", "color": text_color, "padding": "5px 0px"}
 playoff_right = 2000
 playoff_top = 1000
+field_length = 105
+field_width = 68

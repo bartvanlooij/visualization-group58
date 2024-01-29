@@ -10,7 +10,8 @@ from jbi100_app.views.menu import make_menu_layout
 from initial_content import *
 from variables import data_folder
 from playoff import *
-from variables import playoff_right, playoff_top
+from variables import playoff_right, playoff_top, field_width, field_length
+from shotmap import *
 # File paths for the CSV files in same foldefr/
 
 team_data_csv = f'{data_folder}/team_data.csv'
@@ -170,7 +171,7 @@ def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, pla
                                                 figure=fig, 
                                                 style={
                                                         'width': playoff_right, 
-                                                        'height': playoff_top
+                                                        'height': playoff_top,
                                                         }
                                                 ),
                                     html.H2(id='debug')
