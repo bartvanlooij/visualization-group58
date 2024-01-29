@@ -1,5 +1,5 @@
 from dash import html, dcc, Input, Output, State
-from variables import playoff_right, playoff_top, data_folder, field_length, field_width
+from variables import playoff_right, playoff_top, data_folder, field_length, field_width, field_spacing
 from initial_content import app
 import plotly.graph_objects as go
 
@@ -16,9 +16,9 @@ def generate_field(spoilers=False, initialize=False):
     penalty_spot_distance = 11
     penalty_spot_size = 0.5
     goal_circle_arc_radius = 9.15
+    spacing = field_spacing
     fig.update_xaxes(showgrid=False, zeroline=False, visible=False)
     fig.update_yaxes(showgrid=False, zeroline=False, visible=False)
-    spacing = 10
     fig.update_xaxes(range=[0-spacing, field_length+spacing])
     fig.update_yaxes(range=[0-spacing, field_width+spacing])
     
@@ -277,4 +277,24 @@ def generate_field(spoilers=False, initialize=False):
                     layer="below",
                     )
     
-    return fig, ['f']
+    return fig
+
+
+def show_shot_on_map(shotmap, initialize = False):
+    fig = generate_field(initialize=initialize)
+    shotmap = {'eventType': 'Miss',
+                'isOnTarget': False,
+                'min': 66,
+                'situation': 'RegularPlay',
+                'x': 82.4849514568,
+                'y': 34.68625,
+                'goalCrossedY': 43.16,
+                'goalCrossedZ': 6.027172424800001}
+    shot_size = 20
+    colors = {'Miss' : 'red', 'Goal' : 'green', 'Post' : 'orange', 'Saved' : 'blue'}
+    x = shotmap['x']
+    y = shotmap['y']
+    goal_y = shotmap['goalCrossedY']
+    goal_x = field_length
+    fig.add_trace(go.Scatter(x=[int(x)], y=[int(y)], mode='markers', marker=dict(color=colors[shotmap['eventType']],size=shot_size)))
+    return fig

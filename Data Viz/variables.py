@@ -9,3 +9,4 @@ playoff_right = 2000
 playoff_top = 1000
 field_length = 105
 field_width = 68
+field_spacing = 20
