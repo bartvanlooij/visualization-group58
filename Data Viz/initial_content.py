@@ -96,6 +96,14 @@ initial_app_content = html.Div([
             'width': '48%',  # Set width to 50%
             'margin': '10px auto',  # Auto margins horizontally to center the button
             'cursor': 'pointer',
+    }),
+    html.Button('Test button', id='match-dashboard-button', style={
+            'border': '1px solid blue',
+            'fontSize': '20px',
+            'color': 'blue',
+            'width': '48%',  # Set width to 50%
+            'margin': '10px auto',  # Auto margins horizontally to center the button
+            'cursor': 'pointer',
     })], style={'width': '96%','text-align': 'center', 'display': 'inline-block', }),
     # New row for the three graphs
     html.Div([

@@ -13,6 +13,7 @@ from variables import data_folder
 from playoff import *
 from variables import playoff_right, playoff_top, field_width, field_length
 from shotmap import *
+from match_dashboard import *
 # File paths for the CSV files in same foldefr/
 
 team_data_csv = f'{data_folder}/team_data.csv'
@@ -138,10 +139,11 @@ group_accordions = create_accordion(df_teams)
     Output('app-container', 'children'),
     [Input({'type': 'team-button', 'index': ALL}, 'n_clicks'),
      Input('player-comparison-dashboard-button', 'n_clicks'),
-     Input('playoff-bracket-button', 'n_clicks')],
+     Input('playoff-bracket-button', 'n_clicks'),
+     Input('match-dashboard-button', 'n_clicks')],
     prevent_initial_call=True)
 
-def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, playoff_bracket_clicks):
+def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, playoff_bracket_clicks, match_dashboard_clicks):
     ctx = dash.callback_context
 
     if not ctx.triggered:
@@ -182,6 +184,9 @@ def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, pla
     elif 'team-button' in button_id:
         clicked_team = extract_team_name(ctx.triggered[0]['prop_id'])
         return create_team_dashboard(clicked_team)
+    
+    elif 'match-dashboard-button' in button_id:
+        return create_match_dashboard('Senegal', 'Netherlands')
     
     return initial_app_content
 
