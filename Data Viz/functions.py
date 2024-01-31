@@ -139,11 +139,10 @@ group_accordions = create_accordion(df_teams)
     Output('app-container', 'children'),
     [Input({'type': 'team-button', 'index': ALL}, 'n_clicks'),
      Input('player-comparison-dashboard-button', 'n_clicks'),
-     Input('playoff-bracket-button', 'n_clicks'),
-     Input('match-dashboard-button', 'n_clicks')],
+     Input('playoff-bracket-button', 'n_clicks')],
     prevent_initial_call=True)
 
-def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, playoff_bracket_clicks, match_dashboard_clicks):
+def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, playoff_bracket_clicks):
     ctx = dash.callback_context
 
     if not ctx.triggered:
@@ -184,9 +183,6 @@ def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, pla
     elif 'team-button' in button_id:
         clicked_team = extract_team_name(ctx.triggered[0]['prop_id'])
         return create_team_dashboard(clicked_team)
-    
-    elif 'match-dashboard-button' in button_id:
-        return create_match_dashboard(False)
     
     return initial_app_content
 
@@ -615,3 +611,4 @@ def update_player_comparison(n_clicks_1, n_clicks_2, selected_player_1, selected
 
     
     return player_1_display, player_1_table, player_2_display, player_2_table, radar_chart, player_1_defense_chart, player_2_defense_chart, player_1_attacking_chart, player_2_attacking_chart, player_1_shooting_chart, player_2_shooting_chart, player_1_passing_chart, player_2_passing_chart, player_1_dribbling_chart, player_2_dribbling_chart
+

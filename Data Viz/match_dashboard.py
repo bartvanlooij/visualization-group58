@@ -23,13 +23,14 @@ def create_match_dashboard(match_id):
     # match_data = process_match_data(home_team, away_team, match_data_csv)
     dashboard = html.Div([
         html.H2(f"{match['general']['homeTeam']['name']} vs. {match['general']['awayTeam']['name']}", style={'display': 'inline-block', 'margin-right': '10px', 'margin-top': '10px', 'margin-bottom': '10px'}),
-        html.Div([column_match_statistics(shots1, shots2),
+        html.Div([column_match_statistics(match),
                   column_shot_dynamics(match)], 
                   style={'display': 'grid', 'grid-template-columns': '3fr 2fr'})])
     return dashboard
 
-def column_match_statistics(home, away):
-    return html.Div("Match statistics (not for task)")
+def column_match_statistics(match):
+    stats = create_match_stats(match)
+    return html.Div(stats)
 
 def column_shot_dynamics(match):
     shotmap = create_shotmap(match)
@@ -49,9 +50,11 @@ def create_shotmap(match):
 
     return fig 
 
-def create_match_stats(home, away):
-    hi = 'hello'
-    return hi
+def create_match_stats(match):
+    df = pd.json_normalize(match['content']['stats']['Periods']['All']['stats'][0]['stats'])
+    #table = dash_table.DataTable(df)
+    idk = str(df)
+    return idk
 
 # @app.callback(
 #     Output('home-switch-output', 'children'),

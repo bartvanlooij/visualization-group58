@@ -96,14 +96,6 @@ initial_app_content = html.Div([
             'width': '48%',  # Set width to 50%
             'margin': '10px auto',  # Auto margins horizontally to center the button
             'cursor': 'pointer',
-    }),
-    html.Button('Test button', id='match-dashboard-button', style={
-            'border': '1px solid blue',
-            'fontSize': '20px',
-            'color': 'blue',
-            'width': '48%',  # Set width to 50%
-            'margin': '10px auto',  # Auto margins horizontally to center the button
-            'cursor': 'pointer',
     })], style={'width': '96%','text-align': 'center', 'display': 'inline-block', }),
     # New row for the three graphs
     html.Div([
@@ -118,3 +110,6 @@ initial_app_content = html.Div([
         ], style={'width': '32%', 'display': 'inline-block', 'padding': '5px'}),
     ], style={'width': '100%', 'display': 'flex', 'justify-content': 'space-between'}),
 ])
+
+#df = pd.read_csv('player_stats.csv').groupby('club', as_index=False).sum().sort_values('minutes_90s')
+#px.bar(df.tail(10), x='club', y='minutes_90s')
