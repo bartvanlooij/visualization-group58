@@ -280,21 +280,38 @@ def generate_field(spoilers=False, initialize=False):
     return fig
 
 
-def show_shot_on_map(shotmap, initialize = False):
-    fig = generate_field(initialize=initialize)
-    shotmap = {'eventType': 'Miss',
-                'isOnTarget': False,
-                'min': 66,
-                'situation': 'RegularPlay',
-                'x': 82.4849514568,
-                'y': 34.68625,
-                'goalCrossedY': 43.16,
-                'goalCrossedZ': 6.027172424800001}
+def show_shot_on_map(players, initialize = False):
     shot_size = 20
-    colors = {'Miss' : 'red', 'Goal' : 'green', 'Post' : 'orange', 'Saved' : 'blue'}
-    x = shotmap['x']
-    y = shotmap['y']
-    goal_y = shotmap['goalCrossedY']
-    goal_x = field_length
-    fig.add_trace(go.Scatter(x=[int(x)], y=[int(y)], mode='markers', marker=dict(color=colors[shotmap['eventType']],size=shot_size)))
+    colors = {'Miss' : 'red', 'Goal' : 'blue', 'Post' : 'orange', 'AttemptSaved' : 'red'}
+    fig, _ = generate_field(initialize=initialize)
+    x = {}
+    y = {}
+    player_name = {}
+    shot_time = {}
+    for shottype in colors.keys():
+        x[shottype] = []
+        y[shottype] = []
+        player_name[shottype] = []
+        shot_time[shottype] = []
+    event_type = []
+    for player in players:
+        if 'shotmaps' in player.keys():
+            for shotmap in player['shotmaps']:
+                player_name[shotmap['eventType']].append(player['name'])
+                shot_time[shotmap['eventType']].append(shotmap['min'])
+                x[shotmap['eventType']].append(int(shotmap['x']))
+                y[shotmap['eventType']].append(int(shotmap['y']))
+                event_type.append(colors[shotmap['eventType']])
+    text_list = {shottype: [f'{player_name[shottype][i]}<br>{shot_time[shottype][i]} min' 
+                            for i in range(len(player_name[shottype]))] 
+                 for shottype in colors.keys()}
+    
+    for shottype in colors.keys():
+        fig.add_trace(go.Scatter(x=x[shottype], 
+                                 y=y[shottype], 
+                                 mode='markers', 
+                                 marker=dict(color=[colors[shottype] for _ in range(len(x[shottype]))], 
+                                             size=shot_size),
+                                 text=text_list[shottype], 
+                                 name=shottype))
     return fig

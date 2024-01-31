@@ -48,7 +48,7 @@ def create_playoff_bracket(spoilers=False, initialize=False):
                   'Japan': 'Japan',
                   'Croatia': 'Croatia'
                   }
-    heatmap_scale = 0.4
+    heatmap_scale = 0.2
     font = "Courier New, monospace"
     left = 0
     right = playoff_right
