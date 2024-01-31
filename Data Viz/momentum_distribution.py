@@ -17,9 +17,11 @@ def get_momentum(momentum):
 
 
 def create_momentum_distribution(match):
-    match = client.get_match_details(3854556)
     momentum_list, momentum_minutes = get_momentum(match['content']['momentum'])
     df = pd.DataFrame({'minutes': momentum_minutes, 'momentum': momentum_list})
     fig = px.line(df, x='minutes', y='momentum')
+    fig.add_hline(y=0)
+    fig.update_yaxes(range = [-100,100])
+
 
     return fig

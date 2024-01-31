@@ -283,7 +283,7 @@ def generate_field(spoilers=False, initialize=False):
 def show_shot_on_map(players, initialize = False):
     shot_size = 20
     colors = {'Miss' : 'red', 'Goal' : 'blue', 'Post' : 'orange', 'AttemptSaved' : 'red'}
-    fig, _ = generate_field(initialize=initialize)
+    fig = generate_field(initialize=initialize)
     x = {}
     y = {}
     player_name = {}

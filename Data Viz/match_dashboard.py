@@ -7,6 +7,8 @@ from shotmap import show_shot_on_map
 from variables import data_folder
 from initial_content import app
 from momentum_distribution import *
+from api_connection import * 
+
 #import matplotlib.pyplot as plt
 
 
@@ -15,30 +17,36 @@ shots2 = [34,45,48,69,74,77,79,81,85]
 
 df_shots = pd.DataFrame(data={'team1': shots1, 'team2': shots2})
 
-def create_match_dashboard(home, away):
+def create_match_dashboard(match_id):
+    match = client.get_match_details(match_id)
     # function generating the match dashboard 
     # match_data = process_match_data(home_team, away_team, match_data_csv)
     dashboard = html.Div([
-        html.H2(f"{home} vs. {away}", style={'display': 'inline-block', 'margin-right': '10px', 'margin-top': '10px', 'margin-bottom': '10px'}),
+        html.H2(f"{match['general']['homeTeam']['name']} vs. {match['general']['awayTeam']['name']}", style={'display': 'inline-block', 'margin-right': '10px', 'margin-top': '10px', 'margin-bottom': '10px'}),
         html.Div([column_match_statistics(shots1, shots2),
-                  column_shot_dynamics(shots1, shots2)], 
-                  style={'display': 'grid', 'grid-template-columns': '1fr 1fr'})])
+                  column_shot_dynamics(match)], 
+                  style={'display': 'grid', 'grid-template-columns': '3fr 2fr'})])
     return dashboard
 
 def column_match_statistics(home, away):
-    return html.Div("hello")
+    return html.Div("Match statistics (not for task)")
 
-def column_shot_dynamics(home, away):
-    shotmap = create_shotmap(home, away)
-    momentum_dist = create_momentum_distribution(False)
-    return html.Div([dcc.Graph(figure=shotmap), dcc.Graph(figure=momentum_dist)])
+def column_shot_dynamics(match):
+    shotmap = create_shotmap(match)
+    momentum_dist = create_momentum_distribution(match)
+    return html.Div([html.H3("Shotmap"), dcc.Graph(figure=shotmap), html.H3("Momentum"), dcc.Graph(figure=momentum_dist)])
 
 #def create_momentum_distribution(home, away):
     fig = px.line(df_shots, x= 'team1', y= 'team2')
     return fig
 
-def create_shotmap(home, away):
-    fig = show_shot_on_map(False)
+def create_shotmap(match):
+    homePlayers, awayPlayers = get_player_data(match)
+    homePlayers = [parse_api_results(x) for x in homePlayers]
+    awayPlayers = [parse_api_results(x) for x in awayPlayers]
+    
+    fig = show_shot_on_map(homePlayers)
+
     return fig 
 
 def create_match_stats(home, away):

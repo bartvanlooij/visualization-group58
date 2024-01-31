@@ -2,7 +2,7 @@ from attr import field
 import dash
 from dash import html, dcc, Input, Output, State, dash_table, ALL
 from dash.exceptions import PreventUpdate
-import dash_daq as daq
+import dash_daq as daq 
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -186,7 +186,7 @@ def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, pla
         return create_team_dashboard(clicked_team)
     
     elif 'match-dashboard-button' in button_id:
-        return create_match_dashboard('Senegal', 'Netherlands')
+        return create_match_dashboard(False)
     
     return initial_app_content
 

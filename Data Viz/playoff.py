@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from initial_content import app
 import pandas as pd
+from match_dashboard import *
 from variables import data_folder, playoff_right, playoff_top
 import time
 def get_score_stings(df, team_names, teams):
@@ -745,7 +746,13 @@ def bracket_click(clickData, storedata):
             y_range_true.append(index_y)
     
     both_true = list(set(x_range_true).intersection(y_range_true))
+
     if both_true:
-        return str(boxes_text[both_true[0]])
+        df_po = pd.read_csv(f'{data_folder}/match_data.csv')
+        id = df_po.loc[(df_po['home_team'] == str(boxes_text[both_true[0]][0])) & (df_po['away_team'] == str(boxes_text[both_true[0]][1])), 'match_id']
+        return create_match_dashboard(int(id))
         
     return 'No box selected'
+
+
+pd.read_csv(f'{data_folder}/match_data.csv')
