@@ -25,36 +25,57 @@ def create_match_dashboard(match_id):
         html.H2(f"{match['general']['homeTeam']['name']} vs. {match['general']['awayTeam']['name']}", style={'display': 'inline-block', 'margin-right': '10px', 'margin-top': '10px', 'margin-bottom': '10px'}),
         html.Div([column_match_statistics(match),
                   column_shot_dynamics(match)], 
-                  style={'display': 'grid', 'grid-template-columns': '3fr 2fr'})])
+                  style={'display': 'grid', 'grid-template-columns': '3fr 2fr', 'grid-gap': '50px'})],
+        style={'padding': '0 80px'})
     return dashboard
 
 def column_match_statistics(match):
     stats = create_match_stats(match)
-    return html.Div(stats)
+    return html.Div([html.H3("Match statistics"),
+                     stats])
 
-def column_shot_dynamics(match):
-    shotmap = create_shotmap(match)
+def column_shot_dynamics(match, on=True):
+    shotmap = create_shotmap(match, on)
     momentum_dist = create_momentum_distribution(match)
-    return html.Div([html.H3("Shotmap"), dcc.Graph(figure=shotmap), html.H3("Momentum"), dcc.Graph(figure=momentum_dist)])
+    return html.Div([html.Div([html.H3("Shotmap"), 
+                               dcc.Graph(figure=shotmap),
+                               daq.BooleanSwitch(id='home-away-shotmap', on=False),
+                               html.Div(id='home-away-output')]),
+                     html.Div([html.H3("Momentum"), dcc.Graph(figure=momentum_dist)])])
+
+
+@app.callback(
+    Output('home-away-output', 'children'),
+    Input('home-away-shotmap', 'on')
+)
+
+def update_output(on):
+    return f'The switch is {on}.'
 
 #def create_momentum_distribution(home, away):
-    fig = px.line(df_shots, x= 'team1', y= 'team2')
-    return fig
+    #fig = px.line(df_shots, x= 'team1', y= 'team2')
+    #return fig
 
-def create_shotmap(match):
+def create_shotmap(match, on):
     homePlayers, awayPlayers = get_player_data(match)
     homePlayers = [parse_api_results(x) for x in homePlayers]
     awayPlayers = [parse_api_results(x) for x in awayPlayers]
     
-    fig = show_shot_on_map(homePlayers)
+    if on:
+        fig = show_shot_on_map(homePlayers)
+    
+    else:
+        fig = show_shot_on_map(awayPlayers)
 
     return fig 
 
 def create_match_stats(match):
-    df = pd.json_normalize(match['content']['stats']['Periods']['All']['stats'][0]['stats'])
-    #table = dash_table.DataTable(df)
-    idk = str(df)
-    return idk
+    df1 = pd.json_normalize(match['content']['stats']['Periods']['All']['stats'][0]['stats'])
+    df1[['home', 'away']] = pd.DataFrame(df1['stats'].tolist(), index= df1.index)
+    df = df1[['title', 'home', 'away']]
+
+    table = dash_table.DataTable(df.to_dict('records'), [{"name": i, "id": i} for i in df.columns])
+    return table
 
 # @app.callback(
 #     Output('home-switch-output', 'children'),

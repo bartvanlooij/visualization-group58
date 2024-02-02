@@ -171,10 +171,7 @@ def update_dashboard(team_button_clicks, player_comparison_dashboard_clicks, pla
                                     dcc.Graph(
                                                 id='bracket', 
                                                 figure=fig, 
-                                                style={
-                                                        'width': playoff_right, 
-                                                        'height': playoff_top,
-                                                        }
+                                                style={'height': playoff_top}
                                                 ),
                                     html.H2(id='debug')
                                 ]
@@ -193,6 +190,7 @@ def top_scoring_players_modified():
     # Create a bar chart using Plotly
     fig = px.bar(top_scorers, x='player', y='goals', 
                  title="Top 10 Scoring Players", 
+                 template='simple_white', 
                  labels={'player': 'Player', 'goals': 'Goals Scored'})
     fig.update_layout(xaxis_title="Player",
                       yaxis_title="Goals Scored",
@@ -339,6 +337,7 @@ def create_player_stats_table(player_name):
 # Adjusted Function to create a radar chart for two players
 def create_radar_chart(player_name_1, player_name_2):
     fig = go.Figure()
+    fig.update_layout(template='simple_white')
 
     # Remove outliers and then calculate the max values for scaling
     max_aerial = remove_outliers(df_players, 'aerials_won_pct')['aerials_won_pct'].max()
@@ -416,7 +415,7 @@ def create_defense_stats_chart(player_name):
     ])
 
     # Update layout
-    fig.update_layout(title='Defense Stats Comparison', xaxis_title='Stats', yaxis_title='Value per Game')
+    fig.update_layout(title='Defense Stats Comparison', xaxis_title='Stats', yaxis_title='Value per Game', template='simple_white')
     
     return fig
 
@@ -445,7 +444,7 @@ def create_shooting_stats_chart(player_name):
     ])
 
     # Update layout
-    fig.update_layout(title='Shooting Stats Comparison', xaxis_title='Stats', yaxis_title='Value per Match')
+    fig.update_layout(title='Shooting Stats Comparison', xaxis_title='Stats', yaxis_title='Value per Match', template='simple_white')
     
     return fig
 
@@ -474,7 +473,7 @@ def create_attacking_stats_chart(player_name):
     ])
 
     # Update layout
-    fig.update_layout(title='Attacking Stats Comparison', xaxis_title='Stats', yaxis_title='Value per Match')
+    fig.update_layout(title='Attacking Stats Comparison', xaxis_title='Stats', yaxis_title='Value per Match', template='simple_white')
     
     return fig
 
@@ -510,6 +509,7 @@ def create_dribbling_stats_chart(player_name):
         title='Dribbling Stats Comparison',
         xaxis_title='Stats',
         yaxis_title='Value per Match',
+        template='simple_white'
     )
     
     return fig
@@ -539,7 +539,7 @@ def create_passing_stats_chart(player_name):
     ])
 
     # Update layout
-    fig.update_layout(title='Passing Stats Comparison', xaxis_title='Stats', yaxis_title='Value per Game')
+    fig.update_layout(title='Passing Stats Comparison', xaxis_title='Stats', yaxis_title='Value per Game', template='simple_white')
     
     return fig
 
@@ -579,6 +579,7 @@ def update_player_comparison(n_clicks_1, n_clicks_2, selected_player_1, selected
     
     # Initialize an empty radar chart
     radar_chart = go.Figure()
+    radar_chart.update_layout(template='simple_white')
 
     # Check if player 1 is selected and update info and table
     if selected_player_1:

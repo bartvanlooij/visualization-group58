@@ -1,5 +1,6 @@
 from variables import data_folder
 import pandas as pd
+import plotly.express as px 
 player_data_csv = f'{data_folder}/Player_stats.csv'
 match_data_csv = f'{data_folder}/match_data.csv'
 df_teams = pd.read_csv(f'{data_folder}/group_stats.csv')
@@ -62,3 +63,9 @@ def extract_year(age_str):
 df_players['age'] = df_players['age'].apply(extract_year)
 # Convert the 'age' column to integers
 df_players['age'] = df_players['age'].astype(int)
+
+def top_clubs(column):
+    df = pd.read_csv(player_data_csv).groupby('club', as_index=False).sum().sort_values(column)
+    fig = px.bar(df.tail(10), x='club', y=column, template='simple_white')
+
+    return fig

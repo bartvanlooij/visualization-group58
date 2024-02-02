@@ -49,7 +49,8 @@ def top_scoring_players_modified():
     top_scorers = df.sort_values(by='goals', ascending=False).head(10)
     # Create a bar chart using Plotly
     fig = px.bar(top_scorers, x='player', y='goals', 
-                 title="Top 10 Scoring Players", 
+                 title="Top 10 Scoring Players",
+                 template='simple_white', 
                  labels={'player': 'Player', 'goals': 'Goals Scored'})
     fig.update_layout(xaxis_title="Player",
                       yaxis_title="Goals Scored",
@@ -57,8 +58,14 @@ def top_scoring_players_modified():
     return fig
 
 
+def age_dist(data):
+    df = pd.read_csv(data)
+    df['age'] = df['age'].str[:-4].apply(pd.to_numeric)
+    fig = px.histogram(df[['team', 'age', 'minutes']].sort_values('age'), x='age', y='minutes', color='team')
+    return fig  
 
 group_accordions = create_accordion(df_teams)
+
 initial_app_content = html.Div([
     html.H1("FIFA World Cup 2022", style={'textAlign': 'center'}),
     html.H2("Teams", style={'textAlign': 'center'}),
@@ -97,6 +104,10 @@ initial_app_content = html.Div([
             'margin': '10px auto',  # Auto margins horizontally to center the button
             'cursor': 'pointer',
     })], style={'width': '96%','text-align': 'center', 'display': 'inline-block', }),
+    html.Div([dcc.Graph(figure=age_dist(f'{data_folder}/player_stats.csv'))]),
+    html.Div([dcc.Graph(figure=
+                        px.bar(pd.read_csv(f'{data_folder}/player_stats.csv').groupby('club', as_index=False).sum().sort_values('minutes_90s')
+                               .tail(10), x='club', y='minutes_90s', template='simple_white'))]),
     # New row for the three graphs
     html.Div([
         html.Div([
@@ -108,8 +119,7 @@ initial_app_content = html.Div([
         html.Div([
             dcc.Graph(figure=top_scoring_players_modified())
         ], style={'width': '32%', 'display': 'inline-block', 'padding': '5px'}),
-    ], style={'width': '100%', 'display': 'flex', 'justify-content': 'space-between'}),
-])
+    ], style={'width': '100%', 'display': 'flex', 'justify-content': 'space-between'}),], style={'padding': '0 60px'})
 
 #df = pd.read_csv('player_stats.csv').groupby('club', as_index=False).sum().sort_values('minutes_90s')
 #px.bar(df.tail(10), x='club', y='minutes_90s')

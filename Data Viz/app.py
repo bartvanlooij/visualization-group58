@@ -12,6 +12,7 @@ app.layout = html.Div(
     style={
         "fontFamily": "Arial, sans-serif",
         "width": "100%",
+        "min-height": "100vh"
     }
 )
 

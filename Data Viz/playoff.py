@@ -78,6 +78,8 @@ def create_playoff_bracket(spoilers=False, initialize=False):
     final = ['Argentina - France']
     third_place = ['Croatia - Morocco']
     fig = go.Figure()
+    fig.update_layout(template='plotly_white')
+
     fig.update_xaxes(
     showticklabels=False,
     showgrid=False,
@@ -705,6 +707,7 @@ def create_playoff_bracket(spoilers=False, initialize=False):
     Output('bracket', 'figure'),
     Input('spoiler-switch', 'on'),
     prevent_initial_call=True)
+
 def show_match_results(spoilers):
     return create_playoff_bracket(spoilers)
         

@@ -12,17 +12,17 @@ def load_player_data(csv_file_path):
 def top_scoring_teams(team_data):
     # Sorting and selecting top 10 teams based on goals
     top_teams = team_data.sort_values(by='goals', ascending=False).head(10)
-    return px.bar(top_teams, x='team', y='goals', title='Top 10 Scoring Teams')
+    return px.bar(top_teams, x='team', y='goals', title='Top 10 Scoring Teams', template='simple_white')
 
 def best_defensive_teams(team_data):
     # Sorting and selecting top 10 teams based on goalkeeper clean sheets
     top_defensive_teams = team_data.sort_values(by='gk_clean_sheets', ascending=False).head(10)
-    return px.bar(top_defensive_teams, x='team', y='gk_clean_sheets', title='Top 10 Defensive Teams')
+    return px.bar(top_defensive_teams, x='team', y='gk_clean_sheets', title='Top 10 Defensive Teams', template='simple_white')
 
 def top_scoring_players(player_data):
     # Sorting and selecting top 10 players based on goals
     top_players = player_data.sort_values(by='goals', ascending=False).head(10)
-    return px.bar(top_players, x='player', y='goals', title='Top 10 Scoring Players')
+    return px.bar(top_players, x='player', y='goals', title='Top 10 Scoring Players', template='simple_white')
 
 # New functions for team-specific dashboard
 def process_team_data(selected_team, match_data_csv):
@@ -71,7 +71,7 @@ def create_team_performance_chart(team_data, selected_team):
         'Total': team_performance
     })
 
-    fig = px.bar(team_performance_df, x='Statistic', y='Total', title=f'Overall Team Performance for {selected_team}')
+    fig = px.bar(team_performance_df, x='Statistic', y='Total', title=f'Overall Team Performance for {selected_team}', template='simple_white')
     return fig
 
 def normalize_data(data):
@@ -107,7 +107,7 @@ def create_average_specifics_chart(team_data):
                 visible=True,
                 range=[0, 1]
             )),
-        title='Normalized Average Home Match Specifics'
+        title='Normalized Average Home Match Specifics', template='simple_white'
     )
 
     # Create radar chart for away statistics
@@ -116,7 +116,7 @@ def create_average_specifics_chart(team_data):
         theta=away_labels,
         fill='toself'
     ))
-    away_fig.update_layout(
+    away_fig.update_layout(template='simple_white', 
         polar=dict(
             radialaxis=dict(
                 visible=True,
