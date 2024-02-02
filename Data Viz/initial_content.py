@@ -1,4 +1,5 @@
 from dash import html, dcc
+from matplotlib.pyplot import xlabel
 import pandas as pd
 from jbi100_app.modified_data import *
 from variables import data_folder
@@ -11,11 +12,29 @@ app = Dash('FIFA World Cup 2022')
 
 
 def create_accordion(df_teams):
+    image_height = 40
+    image_width = 60
     accordion = []
     for group in sorted(df_teams['group'].unique()):
-        teams_in_group = df_teams[df_teams['group'] == group]
+        teams_in_group = df_teams[df_teams['group'] == group].reset_index(drop=True)
         details = html.Details([
-            html.Summary(f'Group {group}', style={
+            html.Summary([f'Group {group}',
+                          html.Div(id=f'img{group}',
+                     children=[
+                         html.Img(src=f'/assets/{teams_in_group["team"][0]}.png',
+                                  style={'height': f'{image_height}px',
+                                         'width': f'{image_width}px'}),
+                         html.Img(src=f'/assets/{teams_in_group["team"][1]}.png',
+                                  style={'height': f'{image_height}px',
+                                         'width': f'{image_width}px'}),
+                         html.Img(src=f'/assets/{teams_in_group["team"][2]}.png',
+                                  style={'height': f'{image_height}px',
+                                         'width': f'{image_width}px'}),
+                            html.Img(src=f'/assets/{teams_in_group["team"][3]}.png',
+                                    style={'height': f'{image_height}px',
+                                           'width': f'{image_width}px'})],
+                     style={'display': 'flex', 'flexDirection': 'row',
+                             'justifyContent': 'center', 'alignItems': 'center'}),], style={
                 'fontSize': '24px',
                 'fontWeight': 'bold',
                 'color': 'blue'
@@ -61,10 +80,42 @@ def top_scoring_players_modified():
 def age_dist(data):
     df = pd.read_csv(data)
     df['age'] = df['age'].str[:-4].apply(pd.to_numeric)
-    fig = px.histogram(df[['team', 'age', 'minutes']].sort_values('age'), x='age', y='minutes', color='team', template='simple_white')
+    
+    # sort the based on the final round colomn with the order group state, round of 16, quarter finals, semi finals, third place, final
+    df['final_round_int'] = df['final_round'].map({'Group Stage': 1, 'Round of 16': 2, 'Quarter Finals': 3, 'Semi Finals': 4, 'Final': 5})
+    df = df.sort_values('final_round_int')
+    fig = px.box(df, x='final_round', y='age', template='simple_white',
+                 title='Age Distribution of Players by Final Round',
+                 labels=['Group stage', 'Round of 16', 
+                         'Quarter finals', 'Semi finals','Final'])
+    fig.update_layout(xaxis_title="Final Round",
+                      yaxis_title='Age')
+    
+    
+    
     return fig  
 
+
+
+# Create all the figures
 group_accordions = create_accordion(df_teams)
+most_played = px.bar(pd.read_csv(f'{data_folder}/player_stats.csv').groupby('club', as_index=False).sum().sort_values('minutes_90s')
+                               .tail(10), x='club', y='minutes_90s', template='simple_white')
+
+most_played.update_layout(title='Clubs with best performing players', xaxis_title='Club', 
+                          yaxis_title='Total full matches played')
+
+
+top_scoring_teams_graph = top_scoring_teams(load_team_data(team_data_csv))
+top_scoring_teams_graph.update_layout(title='Top Scoring Teams', xaxis_title='Team',
+                                        yaxis_title='Goals Scored')
+
+best_defensive_teams_graph = best_defensive_teams(load_team_data(team_data_csv))
+best_defensive_teams_graph.update_layout(title='Best Defensive Teams', xaxis_title='Team',
+                                            yaxis_title='Clean sheets')
+
+
+
 
 initial_app_content = html.Div([
     html.H1("FIFA World Cup 2022", style={'textAlign': 'center'}),
@@ -105,16 +156,14 @@ initial_app_content = html.Div([
             'cursor': 'pointer',
     })], style={'width': '96%','text-align': 'center', 'display': 'inline-block', }),
     html.Div([dcc.Graph(figure=age_dist(f'{data_folder}/player_stats.csv'))]),
-    html.Div([dcc.Graph(figure=
-                        px.bar(pd.read_csv(f'{data_folder}/player_stats.csv').groupby('club', as_index=False).sum().sort_values('minutes_90s')
-                               .tail(10), x='club', y='minutes_90s', template='simple_white'))]),
+    html.Div([dcc.Graph(figure=most_played)]),
     # New row for the three graphs
     html.Div([
         html.Div([
-            dcc.Graph(figure=top_scoring_teams(load_team_data(team_data_csv)))
+            dcc.Graph(figure=top_scoring_teams_graph)
         ], style={'width': '32%', 'display': 'inline-block', 'padding': '5px'}),
         html.Div([
-            dcc.Graph(figure=best_defensive_teams(load_team_data(team_data_csv)))
+            dcc.Graph(figure=best_defensive_teams_graph)
         ], style={'width': '32%', 'display': 'inline-block', 'padding': '5px'}),
         html.Div([
             dcc.Graph(figure=top_scoring_players_modified())

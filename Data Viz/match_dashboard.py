@@ -24,7 +24,7 @@ def create_match_dashboard(match_id):
     dashboard = html.Div([
         html.H2(f"{match['general']['homeTeam']['name']} vs. {match['general']['awayTeam']['name']}", style={'display': 'inline-block', 'margin-right': '10px', 'margin-top': '10px', 'margin-bottom': '10px'}),
         html.Div([column_match_statistics(match),
-                  column_shot_dynamics(match)], 
+                  column_shot_dynamics(match, match_id)], 
                   style={'display': 'grid', 'grid-template-columns': '3fr 2fr', 'grid-gap': '50px'})],
         style={'padding': '0 80px'})
     return dashboard
@@ -34,13 +34,28 @@ def column_match_statistics(match):
     return html.Div([html.H3("Match statistics"),
                      stats])
 
-def column_shot_dynamics(match, on=True):
-    momentum_dist = create_momentum_distribution(match)
+def column_shot_dynamics(match, match_id, on=True):
+    df_match = pd.read_csv(f'{data_folder}/match_data.csv')
+    home_team = df_match[df_match['match_id'] == match_id]['home_team'].values[0]
+    away_team = df_match[df_match['match_id'] == match_id]['away_team'].values[0]
+    momentum_dist = create_momentum_distribution(match, match_id)
     return html.Div([html.Div([# hack to store match state
                                dcc.Input(id="match", type="text", value=match, style={"display": "none"}),
                                html.H3("Shotmap"), 
                                html.Div(id="shotmap"),
-                               daq.BooleanSwitch(id="home-away-shotmap", on=True, style={"width": "min-content"})]),
+                               html.Div(id='shotmap-bool-container',
+                                        children = [html.Div(f"{home_team}"),
+                                                    daq.BooleanSwitch(id="home-away-shotmap", 
+                                                                      on=True, 
+                                                                      style={"width": "min-content"},
+                                                                      color=None),
+                                                    html.Div(f"{away_team}"),
+                                                    
+                                            ],style={'display': 'flex', 
+                                                     'flexDirection': 'row',
+                                                     'justifyContent': 'center', 
+                                                     'alignItems': 'center'})
+                               ]),
                      html.Div([html.H3("Momentum"), dcc.Graph(figure=momentum_dist)])])
 
 
@@ -51,8 +66,7 @@ def column_shot_dynamics(match, on=True):
 )
 def update_output(match, on):
     label = 'Home' if on else 'Away'
-    return [dcc.Graph(figure=create_shotmap(match, on)),
-            html.Span(label, style={'font-size': '14px'})]
+    return [dcc.Graph(figure=create_shotmap(match, on))]
    
 #def create_momentum_distribution(home, away):
     #fig = px.line(df_shots, x= 'team1', y= 'team2')
