@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from initial_content import app
 import pandas as pd
+from match_dashboard import *
 from variables import data_folder, playoff_right, playoff_top
 import time
 def get_score_stings(df, team_names, teams):
@@ -77,6 +78,8 @@ def create_playoff_bracket(spoilers=False, initialize=False):
     final = ['Argentina - France']
     third_place = ['Croatia - Morocco']
     fig = go.Figure()
+    fig.update_layout(template='plotly_white')
+
     fig.update_xaxes(
     showticklabels=False,
     showgrid=False,
@@ -704,6 +707,7 @@ def create_playoff_bracket(spoilers=False, initialize=False):
     Output('bracket', 'figure'),
     Input('spoiler-switch', 'on'),
     prevent_initial_call=True)
+
 def show_match_results(spoilers):
     return create_playoff_bracket(spoilers)
         
@@ -725,7 +729,7 @@ def bracket_click(clickData, storedata):
                   ['Morocco', 'Spain'],
                   ['Argentina', 'Australia'],
                   ['France', 'Poland'],
-                  ['Netherlands', 'USA'],
+                  ['Netherlands', 'United States'],
                   ['England', 'Senegal'],
                   ['Croatia', 'Brazil'],
                   ['Morocco', 'Portugal'],
@@ -745,7 +749,13 @@ def bracket_click(clickData, storedata):
             y_range_true.append(index_y)
     
     both_true = list(set(x_range_true).intersection(y_range_true))
+
     if both_true:
-        return str(boxes_text[both_true[0]])
+        df_po = pd.read_csv(f'{data_folder}/match_data.csv')
+        id = df_po.loc[(df_po['home_team'] == str(boxes_text[both_true[0]][0])) & (df_po['away_team'] == str(boxes_text[both_true[0]][1])), 'match_id']
+        return create_match_dashboard(int(id))
         
     return 'No box selected'
+
+
+pd.read_csv(f'{data_folder}/match_data.csv')
