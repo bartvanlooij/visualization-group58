@@ -61,7 +61,7 @@ def top_scoring_players_modified():
 def age_dist(data):
     df = pd.read_csv(data)
     df['age'] = df['age'].str[:-4].apply(pd.to_numeric)
-    fig = px.histogram(df[['team', 'age', 'minutes']].sort_values('age'), x='age', y='minutes', color='team')
+    fig = px.histogram(df[['team', 'age', 'minutes']].sort_values('age'), x='age', y='minutes', color='team', template='simple_white')
     return fig  
 
 group_accordions = create_accordion(df_teams)

@@ -35,23 +35,25 @@ def column_match_statistics(match):
                      stats])
 
 def column_shot_dynamics(match, on=True):
-    shotmap = create_shotmap(match, on)
     momentum_dist = create_momentum_distribution(match)
-    return html.Div([html.Div([html.H3("Shotmap"), 
-                               dcc.Graph(figure=shotmap),
-                               daq.BooleanSwitch(id='home-away-shotmap', on=False),
-                               html.Div(id='home-away-output')]),
+    return html.Div([html.Div([# hack to store match state
+                               dcc.Input(id="match", type="text", value=match, style={"display": "none"}),
+                               html.H3("Shotmap"), 
+                               html.Div(id="shotmap"),
+                               daq.BooleanSwitch(id="home-away-shotmap", on=True, style={"width": "min-content"})]),
                      html.Div([html.H3("Momentum"), dcc.Graph(figure=momentum_dist)])])
 
 
 @app.callback(
-    Output('home-away-output', 'children'),
+    Output('shotmap', 'children'),
+    State('match', 'value'),
     Input('home-away-shotmap', 'on')
 )
-
-def update_output(on):
-    return f'The switch is {on}.'
-
+def update_output(match, on):
+    label = 'Home' if on else 'Away'
+    return [dcc.Graph(figure=create_shotmap(match, on)),
+            html.Span(label, style={'font-size': '14px'})]
+   
 #def create_momentum_distribution(home, away):
     #fig = px.line(df_shots, x= 'team1', y= 'team2')
     #return fig

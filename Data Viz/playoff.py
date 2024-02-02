@@ -729,7 +729,7 @@ def bracket_click(clickData, storedata):
                   ['Morocco', 'Spain'],
                   ['Argentina', 'Australia'],
                   ['France', 'Poland'],
-                  ['Netherlands', 'USA'],
+                  ['Netherlands', 'United States'],
                   ['England', 'Senegal'],
                   ['Croatia', 'Brazil'],
                   ['Morocco', 'Portugal'],
